@@ -53,6 +53,7 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
+---
 **Requirements:**
 Python 
 Streamlit
@@ -60,3 +61,4 @@ Pandas
 NumPy
 Matplotlib / Seaborn 
 Openai Langchain
+---
