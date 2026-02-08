@@ -53,10 +53,10 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
-##Requirements:
-Python 3.10 or above
+**Requirements:**
+Python 
 Streamlit
 Pandas
 NumPy
-Matplotlib / Plotly 
-Langchain
+Matplotlib / Seaborn 
+Openai Langchain
