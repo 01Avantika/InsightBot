@@ -5,7 +5,7 @@ The application focuses on simplicity, clean UI, and fast exploratory data analy
 
 ---
 
-## 🚀 Features
+## Features
 
 - 📂 Upload CSV / Excel data files
 - 📊 Auto-generated charts and visualizations
@@ -53,7 +53,7 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
-###Requirements
+##Requirements:
 Python 3.10 or above
 Streamlit
 Pandas
