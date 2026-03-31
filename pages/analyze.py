@@ -50,12 +50,7 @@ st.markdown("""
     .tag-xlsx { background: #1e3a5f; color: #93c5fd; }
 </style>
             
-            provider = get_llm_provider()
-    if provider == "groq":     st.success("🟢 Groq Connected")
-    elif provider == "openai": st.success("🟢 OpenAI Connected")
-    elif provider == "gemini": st.success("🟢 Gemini Connected")
-    else:                      st.warning("🟡 No LLM API Key\nAdd key to .env")
-    st.divider()
+            
 """, unsafe_allow_html=True)
 
 with st.sidebar:

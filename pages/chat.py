@@ -59,11 +59,7 @@ with st.sidebar:
     st.page_link("pages/analyze.py",   label="📁 Upload & Analyze")
     st.page_link("pages/history.py",   label="📜 History")
     st.divider()
-    provider = get_llm_provider()
-    if provider == "openai":   st.success("🟢 OpenAI Connected")
-    elif provider == "gemini": st.success("🟢 Gemini Connected")
-    else:                      st.warning("🟡 No LLM Key Set")
-    st.divider()
+    
     if upload:
         ft = upload.get("file_type","")
         st.markdown(f"**📄 Active File:**\n`{upload.get('filename','')}`")
@@ -75,7 +71,7 @@ with st.sidebar:
     else:
         st.info("No file loaded.\nGo to Upload & Analyze first.")
     st.divider()
-    if st.button("🗑️ Clear Chat"):
+    if st.button("Clear Chat"):
         uid = upload.get("id") if upload else None
         clear_chat(user["id"], uid)
         st.session_state["chat_history"] = []
