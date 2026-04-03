@@ -18,7 +18,6 @@ init_db()
 # Page Configuration
 st.set_page_config(
     page_title="InsightBot — Dashboard",
-    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -156,10 +155,11 @@ with st.sidebar:
     
     # 2. Navigation Links
     st.markdown("### Navigation")
-    st.page_link("pages/dashboard.py", label="Dashboard", icon="📊")
-    st.page_link("pages/analyze.py",   label="Upload & Analyze", icon="📁")
-    st.page_link("pages/chat.py",      label="Chat with Data", icon="💬")
-    st.page_link("pages/history.py",   label="History", icon="📜")
+    st.page_link("pages/dashboard.py", label="Dashboard")
+    st.page_link("pages/analyze.py",   label="Upload & Analyze")
+    st.page_link("pages/automl.py",    label="AutoML")
+    st.page_link("pages/chat.py",      label="Chat with Data")
+    st.page_link("pages/history.py",   label="History")
 
     
     

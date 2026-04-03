@@ -94,10 +94,11 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     
     st.markdown("### Navigation")
-    st.page_link("pages/dashboard.py", label="Dashboard", icon="📊")
-    st.page_link("pages/analyze.py",   label="Upload & Analyze", icon="📁")
-    st.page_link("pages/chat.py",      label="Chat with Data", icon="💬")
-    st.page_link("pages/history.py",   label="History", icon="📜")
+    st.page_link("pages/dashboard.py", label="Dashboard")
+    st.page_link("pages/analyze.py",   label="Upload & Analyze")
+    st.page_link("pages/automl.py",    label="AutoML")
+    st.page_link("pages/chat.py",      label="Chat with Data")
+    st.page_link("pages/history.py",   label="History")
     
     # Adjusted spacer height to move logout a little further down
     st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
