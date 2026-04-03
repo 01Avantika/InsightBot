@@ -1,6 +1,6 @@
 # InsightBot — AI-Powered Data Analytics Platform
 
-InsightBot is a full-stack AI data analytics platform that lets anyone — technical or not — upload a dataset or document and instantly get automated analysis, interactive visualizations, AI-generated insights, and conversational Q&A. No code required.
+InsightBot is a full-stack AI data analytics platform that lets anyone — technical or not — upload a dataset or document and instantly get automated analysis, interactive visualizations, AI-generated insights, and conversational Q&A. 
 
 ---
 

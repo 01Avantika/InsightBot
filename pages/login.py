@@ -62,7 +62,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.write('<div class="login-container">', unsafe_allow_html=True)
-tab_login, tab_signup = st.tabs(["🔑 Login", "✨ Create Account"])
+tab_login, tab_signup = st.tabs([" Login", " Create Account"])
 
 with tab_login:
     st.subheader("Welcome back")
