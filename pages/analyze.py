@@ -1,5 +1,5 @@
 """
-pages/analyze.py — Fixed duplicate keys + delete file feature
+pages/analyze.py — Fixed duplicate keys + delete file feature + Adaptive Theme
 """
 
 import streamlit as st
@@ -25,44 +25,93 @@ if not st.session_state.get("user"):
 
 user = st.session_state["user"]
 
+# ---------------- ADAPTIVE CUSTOM CSS (Light/Dark Mode Fix) ----------------
 st.markdown("""
 <style>
-    .stApp { background: #0f172a; color: #e2e8f0; }
+    /* HIDE DEFAULT STREAMLIT NAV */
+    [data-testid="stSidebarNav"] {display: none;}
+
+    /* SECTION HEADERS - Adaptive */
     .section-header {
-        font-size: 1.2rem; font-weight: 700; color: #e2e8f0;
+        font-size: 1.2rem; font-weight: 700; color: var(--text-color);
         border-left: 4px solid #7c3aed; padding-left: 0.75rem; margin: 1.5rem 0 1rem;
     }
-    .stat-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; text-align: center; }
-    .stat-val  { font-size: 1.8rem; font-weight: 700; color: #a78bfa; }
-    .stat-lbl  { color: #94a3b8; font-size: 0.8rem; }
+
+    /* STAT BOXES & FILE CARDS - Adaptive Background */
+    .stat-box, .file-card { 
+        background-color: var(--secondary-background-color); 
+        border: 1px solid rgba(124, 58, 237, 0.2); 
+        border-radius: 12px; padding: 1rem; text-align: center; 
+        margin-bottom: 0.5rem;
+    }
+    .stat-val { font-size: 1.8rem; font-weight: 700; color: #7c3aed; }
+    .stat-lbl { color: var(--text-color); opacity: 0.7; font-size: 0.8rem; }
+
+    /* BUTTONS */
     div.stButton > button {
         background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
         color: white !important; border: none !important; border-radius: 10px !important;
+        font-weight: 600 !important;
     }
-    [data-testid="stSidebar"] { background: #1e293b !important; }
-    .file-card {
-        background: rgba(124,58,237,0.08); border: 1px solid rgba(167,139,250,0.25);
-        border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 0.5rem;
+
+    /* SIDEBAR USER FOOTER */
+    .user-profile-footer {
+        display: flex; align-items: center; gap: 12px; padding: 12px;
+        border-radius: 12px; background-color: var(--secondary-background-color);
+        border: 1px solid rgba(124, 58, 237, 0.2); margin-top: 10px;
     }
-    .tag { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-    .tag-csv  { background: #065f46; color: #6ee7b7; }
-    .tag-pdf  { background: #7f1d1d; color: #fca5a5; }
-    .tag-xlsx { background: #1e3a5f; color: #93c5fd; }
+    .user-avatar {
+        width: 40px; height: 40px; background-color: #7c3aed; color: white !important;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
+    .user-email { font-size: 0.75rem; color: var(--text-color); opacity: 0.6; }
+
+    /* FILE TAGS */
+    .tag { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; color: white; }
+    .tag-csv  { background: #059669; }
+    .tag-pdf  { background: #dc2626; }
+    .tag-xlsx { background: #2563eb; }
 </style>
-            
-            
 """, unsafe_allow_html=True)
 
+# ---------------- SIDEBAR WITH USER FOOTER ----------------
 with st.sidebar:
-    st.markdown(f"### 👤 {user['username']}")
+    st.markdown("""
+        <div style='margin-bottom:2.5rem; display:flex; align-items:center; gap:10px;'>
+            <div style='font-size:28px;'>🤖</div>
+            <div style='font-weight:700; font-size:22px; color:#7c3aed;'>InsightBot</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("### Navigation")
+    st.page_link("pages/dashboard.py", label="Dashboard", icon="📊")
+    st.page_link("pages/analyze.py",   label="Upload & Analyze", icon="📁")
+    st.page_link("pages/chat.py",      label="Chat with Data", icon="💬")
+    st.page_link("pages/history.py",   label="History", icon="📜")
+
+    
+    
+    st.markdown("<div style='flex-grow: 1; height: 100px;'></div>", unsafe_allow_html=True)
     st.divider()
-    st.page_link("pages/dashboard.py", label="📊 Dashboard")
-    st.page_link("pages/chat.py",      label="💬 Chat with Data")
-    st.page_link("pages/history.py",   label="📜 History")
-    st.divider()
-    if st.button("Logout"):
-        for k in list(st.session_state.keys()):
-            del st.session_state[k]
+
+    u_name = user.get('username', 'User')
+    u_email = user.get('email', 'user@example.com')
+    u_initial = u_name[0].upper() if u_name else "U"
+
+    st.markdown(f"""
+        <div class="user-profile-footer">
+            <div class="user-avatar">{u_initial}</div>
+            <div class="user-info">
+                <div class="user-name">{u_name}</div>
+                <div class="user-email">{u_email}</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("Logout", use_container_width=True):
+        st.session_state.clear()
         st.switch_page("pages/login.py")
 
 st.markdown("# 📁 Upload & Analyze")
@@ -143,7 +192,9 @@ def render_analysis(file_path, ext, filename, upload_id, prefix=""):
                 elif chart_type == "Pie":
                     vc = df[x_col].value_counts().head(10)
                     fig = px.pie(values=vc.values, names=vc.index, title=f"{x_col} Distribution")
-                fig.update_layout(template="plotly_dark", height=420)
+                
+                # Dynamic theme application for Plotly
+                fig.update_layout(height=420)
                 st.plotly_chart(fig, use_container_width=True, key=f"custom_chart_{k}")
             except Exception as e:
                 st.error(f"Chart error: {e}")
@@ -247,7 +298,7 @@ with tab_resume:
             with col1:
                 st.markdown(f"""<div class="file-card">
                     <span class="tag {tag_cls}">{ext.upper()}</span>
-                    &nbsp;<b style='color:#e2e8f0'>{u['filename']}</b>
+                    &nbsp;<b style='color:var(--text-color)'>{u['filename']}</b>
                     <span style='color:#64748b; font-size:0.8rem; float:right'>{u['uploaded_at'][:16]} · {format_file_size(u.get('file_size',0))}</span>
                 </div>""", unsafe_allow_html=True)
 

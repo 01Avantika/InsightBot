@@ -1,8 +1,8 @@
-# Core 
+# Core
 streamlit==1.35.0
 python-dotenv==1.0.1
 
-# ── Data Stack
+# Data Stack
 pandas==2.2.2
 numpy==1.26.4
 openpyxl==3.1.4
@@ -14,6 +14,7 @@ seaborn==0.13.2
 matplotlib==3.8.4
 
 # LangChain Ecosystem 
+# LangChain Ecosystem
 langchain==0.2.6
 langchain-community==0.2.6
 langchain-openai==0.1.14

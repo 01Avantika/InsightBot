@@ -1,16 +1,11 @@
 """
-pages/chat.py — Conversational Q&A for data and documents
+pages/chat.py — Conversational Q&A for data and documents + Adaptive Theme
 """
 
 import streamlit as st
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-
-from db.database import save_message, get_user_chats, clear_chat, init_db
-from utils.llm import answer_data_question, answer_pdf_question, pandas_query, get_llm_provider
-
-init_db()
 
 st.set_page_config(page_title="InsightBot — Chat", page_icon="💬", layout="wide")
 
@@ -25,39 +20,72 @@ df_summary  = st.session_state.get("current_df_summary", "")
 vectorstore = st.session_state.get("current_vectorstore")
 pdf_text    = st.session_state.get("current_pdf_text", "")
 
+# ---------------- ADAPTIVE CUSTOM CSS (Light/Dark Mode Fix) ----------------
 st.markdown("""
 <style>
-    .stApp { background: #0f172a; color: #e2e8f0; }
+    /* HIDE DEFAULT STREAMLIT NAV */
+    [data-testid="stSidebarNav"] {display: none;}
+
+    /* CHAT BUBBLES - Adaptive */
     .chat-bubble-user {
         background: linear-gradient(135deg, #7c3aed, #6d28d9);
-        color: white; border-radius: 18px 18px 4px 18px;
+        color: white !important; border-radius: 18px 18px 4px 18px;
         padding: 0.75rem 1.1rem; margin: 0.4rem 0;
         max-width: 75%; margin-left: auto;
     }
     .chat-bubble-ai {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(167,139,250,0.2);
-        color: #e2e8f0; border-radius: 18px 18px 18px 4px;
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(124, 58, 237, 0.2);
+        color: var(--text-color); border-radius: 18px 18px 18px 4px;
         padding: 0.75rem 1.1rem; margin: 0.4rem 0; max-width: 80%;
     }
+    
+    /* CONTEXT BADGE */
     .context-badge {
-        background: rgba(124,58,237,0.2); border: 1px solid rgba(167,139,250,0.3);
+        background-color: var(--secondary-background-color); 
+        border: 1px solid rgba(124, 58, 237, 0.3);
         border-radius: 8px; padding: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;
+        color: var(--text-color);
     }
+
+    /* BUTTONS */
     div.stButton > button {
         background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
         color: white !important; border: none !important; border-radius: 10px !important;
+        font-weight: 600 !important;
     }
-    [data-testid="stSidebar"] { background: #1e293b !important; }
+
+    /* SIDEBAR USER FOOTER */
+    .user-profile-footer {
+        display: flex; align-items: center; gap: 12px; padding: 12px;
+        border-radius: 12px; background-color: var(--secondary-background-color);
+        border: 1px solid rgba(124, 58, 237, 0.2); margin-top: 10px;
+    }
+    .user-avatar {
+        width: 40px; height: 40px; background-color: #7c3aed; color: white !important;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
+    .user-email { font-size: 0.75rem; color: var(--text-color); opacity: 0.6; }
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------- SIDEBAR WITH USER FOOTER ----------------
 with st.sidebar:
-    st.markdown(f"### 👤 {user['username']}")
-    st.divider()
-    st.page_link("pages/dashboard.py", label="📊 Dashboard")
-    st.page_link("pages/analyze.py",   label="📁 Upload & Analyze")
-    st.page_link("pages/history.py",   label="📜 History")
+    st.markdown("""
+        <div style='margin-bottom:2.5rem; display:flex; align-items:center; gap:10px;'>
+            <div style='font-size:28px;'>🤖</div>
+            <div style='font-weight:700; font-size:22px; color:#7c3aed;'>InsightBot</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("### Navigation")
+    st.page_link("pages/dashboard.py", label="Dashboard", icon="📊")
+    st.page_link("pages/analyze.py",   label="Upload & Analyze", icon="📁")
+    st.page_link("pages/chat.py",      label="Chat with Data", icon="💬")
+    st.page_link("pages/history.py",   label="History", icon="📜")
+    
     st.divider()
     
     if upload:
@@ -70,17 +98,35 @@ with st.sidebar:
             else:           st.warning("Text mode (no index)")
     else:
         st.info("No file loaded.\nGo to Upload & Analyze first.")
-    st.divider()
-    if st.button("Clear Chat"):
+    
+    if st.button("Clear Chat", use_container_width=True):
         uid = upload.get("id") if upload else None
         clear_chat(user["id"], uid)
         st.session_state["chat_history"] = []
         st.rerun()
-    if st.button(" Logout"):
-        for k in list(st.session_state.keys()):
-            del st.session_state[k]
+
+    st.markdown("<div style='flex-grow: 1; height: 50px;'></div>", unsafe_allow_html=True)
+    st.divider()
+
+    u_name = user.get('username', 'User')
+    u_email = user.get('email', 'user@example.com')
+    u_initial = u_name[0].upper() if u_name else "U"
+
+    st.markdown(f"""
+        <div class="user-profile-footer">
+            <div class="user-avatar">{u_initial}</div>
+            <div class="user-info">
+                <div class="user-name">{u_name}</div>
+                <div class="user-email">{u_email}</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("Logout", use_container_width=True, key="logout_btn"):
+        st.session_state.clear()
         st.switch_page("pages/login.py")
 
+# ---------------- MAIN CONTENT ----------------
 st.markdown("# 💬 Chat with Your Data")
 
 if not upload:

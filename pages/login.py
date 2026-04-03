@@ -18,18 +18,30 @@ st.set_page_config(page_title="InsightBot — Login", page_icon="🤖", layout="
 if st.session_state.get("user"):
     st.switch_page("pages/dashboard.py")
 
+# --- THEME AWARE CSS ---
 st.markdown("""
 <style>
-    .stApp { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+    /* REMOVED .stApp gradient to allow 3-dot theme switching */
+    
     .brand { text-align: center; margin-bottom: 1.5rem; }
-    .brand h1 { color: #a78bfa; font-size: 2.5rem; margin: 0; }
-    .brand p  { color: #94a3b8; font-size: 0.95rem; }
+    .brand h1 { color: #7c3aed; font-size: 2.5rem; margin: 0; }
+    .brand p  { opacity: 0.7; font-size: 0.95rem; }
+    
+    /* Input fields that adapt to Light/Dark background */
     div[data-testid="stTextInput"] input {
-        background: rgba(255,255,255,0.08) !important;
-        border: 1px solid rgba(167,139,250,0.3) !important;
-        color: #f1f5f9 !important;
+        background: rgba(124, 58, 237, 0.05) !important;
+        border: 1px solid rgba(124, 58, 237, 0.2) !important;
         border-radius: 10px !important;
     }
+    
+    /* Login Box Container */
+    .login-container {
+        padding: 2rem;
+        border-radius: 15px;
+        background: rgba(124, 58, 237, 0.03);
+        border: 1px solid rgba(124, 58, 237, 0.1);
+    }
+
     div.stButton > button {
         background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
         color: white !important; border: none !important;
@@ -37,9 +49,8 @@ st.markdown("""
         padding: 0.6rem !important; font-size: 1rem !important;
         font-weight: 600 !important;
     }
-    .stTabs [data-baseweb="tab"] { color: #94a3b8 !important; }
-    .stTabs [aria-selected="true"] { color: #a78bfa !important; border-bottom-color: #a78bfa !important; }
-    label { color: #cbd5e1 !important; }
+    
+    .stTabs [aria-selected="true"] { color: #7c3aed !important; border-bottom-color: #7c3aed !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -50,6 +61,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.write('<div class="login-container">', unsafe_allow_html=True)
 tab_login, tab_signup = st.tabs(["🔑 Login", "✨ Create Account"])
 
 with tab_login:
@@ -97,3 +109,4 @@ with tab_signup:
                 st.switch_page("pages/dashboard.py")
             except ValueError as e:
                 st.error(str(e))
+st.write('</div>', unsafe_allow_html=True)

@@ -12,11 +12,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# Initialize theme state
 if "theme" not in st.session_state:
     st.session_state["theme"] = "dark"
 
 is_dark = st.session_state["theme"] == "dark"
 
+# Theme Colors
 if is_dark:
     bg="08090f"; bg2="0e1117"; bg3="0b0d16"
     text="f0f2f8"; text2="8892a4"; text3="3d4455"
@@ -26,6 +28,9 @@ if is_dark:
     pill_bg="rgba(120,80,255,0.1)"; pill_border="rgba(120,80,255,0.28)"
     stat_bg="0e1117"; tog_bg="rgba(255,255,255,0.07)"; tog_border="rgba(255,255,255,0.15)"
     tog_color="c4b5fd"; btn_sh="rgba(109,40,217,0.45)"
+    dot_color="rgba(255,255,255,0.55)"; dot_hover="rgba(255,255,255,0.9)"
+    menu_bg="#13141f"; menu_border="rgba(139,92,246,0.25)"; menu_text="#d4c8ff"
+    menu_hover="rgba(139,92,246,0.12)"
 else:
     bg="fafbff"; bg2="ffffff"; bg3="f4f5ff"
     text="0d0f1a"; text2="5a6478"; text3="aab4c4"
@@ -35,8 +40,9 @@ else:
     pill_bg="rgba(109,40,217,0.07)"; pill_border="rgba(109,40,217,0.2)"
     stat_bg="ffffff"; tog_bg="rgba(0,0,0,0.05)"; tog_border="rgba(0,0,0,0.12)"
     tog_color="6d28d9"; btn_sh="rgba(109,40,217,0.3)"
-
-tl = "Light Mode" if is_dark else "Dark Mode"
+    dot_color="rgba(0,0,0,0.45)"; dot_hover="rgba(0,0,0,0.85)"
+    menu_bg="#ffffff"; menu_border="rgba(109,40,217,0.18)"; menu_text="#4c1d95"
+    menu_hover="rgba(109,40,217,0.07)"
 
 st.markdown(f"""
 <style>
@@ -54,13 +60,14 @@ div[data-testid="stVerticalBlock"]>div{{padding:0!important;gap:0!important;}}
 @keyframes pulseDot{{0%,100%{{opacity:1}}50%{{opacity:0.4}}}}
 @keyframes gradMove{{0%{{background-position:0% 50%}}50%{{background-position:100% 50%}}100%{{background-position:0% 50%}}}}
 
+/* ── NAVBAR ── */
 .navbar{{
   position:fixed;top:0;left:0;right:0;z-index:9999;
   background:{nav_bg};backdrop-filter:blur(24px);
-  border-bottom:1px solid #{card_border.replace('rgba(120,80,255,0.16)','1a1a2e') if is_dark else '1a1a2e'};
-  padding:0 3rem;height:58px;
+  padding:0 2.4rem;height:58px;
   display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,{'.06' if is_dark else '.12'});
+  border-bottom:1px solid rgba(255,255,255,{'.06' if is_dark else '.0'});
+  {'border-bottom:1px solid rgba(0,0,0,.07);' if not is_dark else ''}
 }}
 .nav-brand{{font-size:1.1rem;font-weight:800;letter-spacing:-0.5px;
   background:linear-gradient(135deg,#8b5cf6,#a78bfa);
@@ -69,15 +76,49 @@ div[data-testid="stVerticalBlock"]>div{{padding:0!important;gap:0!important;}}
 .nav-link{{color:#{text2};text-decoration:none;font-size:0.75rem;font-weight:600;
   letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;}}
 .nav-link:hover{{color:#{text};}}
-.nav-right{{display:flex;align-items:center;}}
-.tog{{
-  background:{tog_bg};border:1px solid {tog_border};
-  color:#{tog_color};border-radius:6px;
-  padding:0.3rem 0.75rem;font-size:0.7rem;font-weight:700;
-  letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;
-  white-space:nowrap;line-height:1.4;
-}}
+.nav-right{{display:flex;align-items:center;position:relative;}}
 
+/* 3-dot button */
+.three-dot-btn{{
+  background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:8px;border-radius:8px;
+  transition:background 0.2s;
+  width:36px;height:36px;
+}}
+.three-dot-btn:hover{{background:{menu_hover};}}
+.three-dot-btn span{{
+  display:block;width:4px;height:4px;border-radius:50%;
+  background:{dot_color};transition:background 0.2s;
+}}
+.three-dot-btn:hover span{{background:{dot_hover};}}
+
+/* Dropdown menu */
+.dot-menu{{
+  display:none;
+  position:absolute;top:calc(100% + 10px);right:0;
+  background:{menu_bg};
+  border:1px solid {menu_border};
+  border-radius:10px;
+  min-width:160px;
+  box-shadow:0 8px 32px rgba(0,0,0,{'.45' if is_dark else '.12'});
+  overflow:hidden;
+  z-index:99999;
+}}
+.dot-menu.open{{display:block;animation:fadeUp 0.18s ease both;}}
+.dot-menu-item{{
+  display:flex;align-items:center;gap:0.65rem;
+  padding:0.65rem 1rem;
+  font-size:0.78rem;font-weight:600;
+  color:{menu_text};
+  cursor:pointer;
+  transition:background 0.15s;
+  white-space:nowrap;
+}}
+.dot-menu-item:hover{{background:{menu_hover};}}
+.dot-menu-item .icon{{font-size:1rem;}}
+
+/* COMPONENT STYLES */
 .hero{{
   min-height:100vh;background:#{bg};
   background-image:
@@ -202,10 +243,23 @@ div.stButton>button:hover{{transform:translateY(-2px)!important;box-shadow:0 8px
 }}
 .fb{{font-size:0.9rem;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}}
 .fc{{font-size:0.74rem;color:#{text3};}}
+
+/* COMPLETELY HIDE THE TRIGGER BUTTON */
+[data-testid="stFormSubmitButton"] button, 
+div.stButton > button[key="theme_nav"] {{
+    display: none !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
-# NAVBAR — pure HTML, toggle as Streamlit button in fixed position
+# ── THEME LOGIC ──
+def toggle_theme():
+    st.session_state["theme"] = "light" if st.session_state["theme"] == "dark" else "dark"
+
+# Create a hidden button that the JS can click
+st.button("THEME_TRIGGER", key="theme_nav", on_click=toggle_theme)
+
+# ── NAVBAR ──
 st.markdown(f"""
 <div class="navbar">
   <div class="nav-brand">InsightBot</div>
@@ -214,53 +268,51 @@ st.markdown(f"""
     <a class="nav-link" href="#process">Process</a>
     <a class="nav-link" href="#stack">Stack</a>
   </div>
-  <div class="nav-right" id="tog-anchor"></div>
+  <div class="nav-right">
+    <button class="three-dot-btn" id="dotBtn" onclick="toggleMenu(event)">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="dot-menu" id="dotMenu">
+      <div class="dot-menu-item" onclick="triggerTheme()">
+        <span class="icon">{'☀️' if is_dark else '🌙'}</span>
+        {'Light Mode' if is_dark else 'Dark Mode'}
+      </div>
+    </div>
+  </div>
 </div>
-""", unsafe_allow_html=True)
 
-# Theme toggle — fixed position top right, small pill
-st.markdown(f"""
-<style>
-  div[data-testid="stHorizontalBlock"] {{ gap: 0 !important; }}
-  .tog-fixed {{
-    position: fixed; top: 14px; right: 2.5rem; z-index: 99999;
+<script>
+function toggleMenu(e) {{
+  e.stopPropagation();
+  var menu = document.getElementById('dotMenu');
+  menu.classList.toggle('open');
+}}
+document.addEventListener('click', function() {{
+  var menu = document.getElementById('dotMenu');
+  if (menu) menu.classList.remove('open');
+}});
+function triggerTheme() {{
+  var btns = window.parent.document.querySelectorAll('button');
+  for (var b of btns) {{
+    if (b.innerText.trim() === "THEME_TRIGGER") {{
+      b.click();
+      break;
+    }}
   }}
-  .tog-fixed > div > button {{
-    background: {tog_bg} !important;
-    border: 1px solid {tog_border} !important;
-    color: #{tog_color} !important;
-    border-radius: 5px !important;
-    padding: 0.28rem 0.7rem !important;
-    font-size: 0.65rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
-    text-transform: uppercase !important;
-    box-shadow: none !important;
-    min-height: 0 !important;
-    line-height: 1.3 !important;
-  }}
-  .tog-fixed > div > button:hover {{ opacity: 0.85 !important; transform: none !important; }}
-</style>
-<div class="tog-fixed" id="tog-wrap">
+}}
+</script>
 """, unsafe_allow_html=True)
-
-if st.button(tl, key="theme_nav"):
-    st.session_state["theme"] = "light" if is_dark else "dark"
-    st.rerun()
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 # HERO
 st.markdown(f"""
 <div class="hero">
   <div class="badge"><span class="dot"></span>AI-Powered Data Intelligence Platform</div>
-  <h1 class="h1">Turn Your Data Into<br><span class="g">Actionable Insights</span></h1>
+  <h1 class="h1">Turn Your Data Into<br><span class="g">Actionable Insights </span></h1>
   <p class="sub">Upload CSVs, Excel files, or PDFs and instantly get AI-generated analysis,
   beautiful visualizations, and conversational Q&amp;A — no coding required.</p>
 </div>
 """, unsafe_allow_html=True)
 
-# GET STARTED button directly below hero
 c1,c2,c3 = st.columns([3.5,1,3.5])
 with c2:
     if st.button("Get Started", key="hero_cta"):
@@ -311,7 +363,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# TECH STACK — described in plain language, not listed
+# TECH STACK
 st.markdown(f"""
 <div class="sec" id="stack">
   <div class="ey">Technology</div>
