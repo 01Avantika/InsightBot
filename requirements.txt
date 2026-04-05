@@ -1,41 +1,41 @@
 # Core
-streamlit==1.35.0
-python-dotenv==1.0.1
+streamlit
+python-dotenv
 
-# Data Stack
-pandas==2.2.2
-numpy==1.26.4
-openpyxl==3.1.4
-scikit-learn==1.5.0
+# Data Stack (Versions removed to allow pre-compiled downloads)
+pandas
+numpy
+openpyxl
+scikit-learn
 
 # Visualization
-plotly==5.22.0
-seaborn==0.13.2
-matplotlib==3.8.4
+plotly
+seaborn
+matplotlib
 
 # LangChain Ecosystem
-langchain==0.2.6
-langchain-community==0.2.6
-langchain-openai==0.1.14
-langchain-google-genai==1.0.6
-langchain-text-splitters==0.2.2
+langchain
+langchain-community
+langchain-openai
+langchain-google-genai
+langchain-text-splitters
 
 # Vector DB
-faiss-cpu==1.8.0
+faiss-cpu
 
 # LLM Providers
-openai==1.35.3
-google-generativeai==0.5.4
-groq==0.9.0
-tiktoken==0.7.0
+openai
+google-generativeai
+groq
+tiktoken
 
 # File Handling
-pypdf==4.2.0
-pdfplumber==0.11.1
+pypdf
+pdfplumber
 
 # Auth & DB
-bcrypt==4.1.3
-sqlalchemy==2.0.30
+bcrypt
+sqlalchemy
 
 # Embeddings
-sentence-transformers==3.0.1
+sentence-transformers
