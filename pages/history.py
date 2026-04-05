@@ -11,6 +11,7 @@ load_dotenv()
 
 from db.database import get_user_uploads, get_user_analyses, get_user_chats, init_db, get_connection
 from utils.file_handler import format_file_size
+from utils.ui_components import render_sidebar
 
 init_db()
 
@@ -21,29 +22,25 @@ if not st.session_state.get("user"):
     st.switch_page("pages/login.py")
 
 user = st.session_state["user"]
+render_sidebar(user)
 
-# ---------------- ADAPTIVE CUSTOM CSS (Light/Dark Mode Fix) ----------------
+# ── Page-specific CSS ────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* HIDE DEFAULT STREAMLIT NAV */
-    [data-testid="stSidebarNav"] {display: none;}
-
     .section-header {
-        font-size: 1.2rem; font-weight: 700; color: var(--text-color);
+        font-size: 1.2rem; font-weight: 700; color: var(--text-h);
         border-left: 4px solid #7c3aed; padding-left: 0.75rem; margin: 1.5rem 0 1rem;
     }
     .history-row {
-        background: var(--secondary-background-color); 
+        background: var(--bg-elevated);
         border: 1px solid rgba(124, 58, 237, 0.2);
         border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.6rem;
-        color: var(--text-color);
+        color: var(--text-h);
     }
     .tag { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
     .tag-csv  { background: #065f46; color: #6ee7b7; }
     .tag-pdf  { background: #7f1d1d; color: #fca5a5; }
     .tag-xlsx { background: #1e3a5f; color: #93c5fd; }
-    
-    /* CHAT BUBBLES - Adaptive */
     .chat-bubble-user {
         background: linear-gradient(135deg, #7c3aed, #6d28d9);
         color: white !important; border-radius: 18px 18px 4px 18px;
@@ -51,76 +48,18 @@ st.markdown("""
         max-width: 75%; width: fit-content; margin-left: auto;
     }
     .chat-bubble-ai {
-        background-color: var(--secondary-background-color);
+        background: var(--bg-elevated);
         border: 1px solid rgba(124, 58, 237, 0.2);
-        color: var(--text-color); border-radius: 18px 18px 18px 4px;
+        color: var(--text-h); border-radius: 18px 18px 18px 4px;
         padding: 0.7rem 1rem; margin: 0.4rem 0;
         max-width: 80%; width: fit-content;
     }
-    .chat-meta { font-size: 0.7rem; color: var(--text-color); opacity: 0.6; margin: 0.1rem 0.3rem; }
-    
-    /* BUTTONS */
-    div.stButton > button {
-        background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
-        color: white !important; border: none !important; border-radius: 10px !important;
-        font-weight: 600 !important;
-    }
-
-    /* SIDEBAR USER FOOTER */
-    .user-profile-footer {
-        display: flex; align-items: center; gap: 12px; padding: 12px;
-        border-radius: 12px; background-color: var(--secondary-background-color);
-        border: 1px solid rgba(124, 58, 237, 0.2); margin-top: 5px;
-    }
-    .user-avatar {
-        width: 40px; height: 40px; background-color: #7c3aed; color: white !important;
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
-    }
-    .user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
-    .user-email { font-size: 0.75rem; color: var(--text-color); opacity: 0.6; }
-    
-    .empty-state { text-align:center; padding:3rem; color:var(--text-color); opacity:0.5; border:1px dashed rgba(124,58,237,0.3); border-radius:16px; }
+    .chat-meta { font-size: 0.7rem; color: var(--text-b); opacity: 0.6; margin: 0.1rem 0.3rem; }
+    .empty-state { text-align:center; padding:3rem; color:var(--text-b); opacity:0.5; border:1px dashed rgba(124,58,237,0.3); border-radius:16px; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- SIDEBAR WITH USER FOOTER ----------------
-with st.sidebar:
-    st.markdown("""
-        <div style='margin-bottom:2.5rem; display:flex; align-items:center; gap:10px;'>
-            <div style='font-size:28px;'>🤖</div>
-            <div style='font-weight:700; font-size:22px; color:#7c3aed;'>InsightBot</div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("### Navigation")
-    st.page_link("pages/dashboard.py", label="Dashboard")
-    st.page_link("pages/analyze.py",   label="Upload & Analyze")
-    st.page_link("pages/automl.py",    label="AutoML")
-    st.page_link("pages/chat.py",      label="Chat with Data")
-    st.page_link("pages/history.py",   label="History")
-    
-    # Adjusted spacer height to move logout a little further down
-    st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
-    st.divider()
 
-    u_name = user.get('username', 'User')
-    u_email = user.get('email', 'user@example.com')
-    u_initial = u_name[0].upper() if u_name else "U"
-
-    st.markdown(f"""
-        <div class="user-profile-footer">
-            <div class="user-avatar">{u_initial}</div>
-            <div class="user-info">
-                <div class="user-name">{u_name}</div>
-                <div class="user-email">{u_email}</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("Logout", use_container_width=True):
-        st.session_state.clear()
-        st.switch_page("pages/login.py")
 
 # ---------------- MAIN CONTENT ----------------
 st.markdown("# 📜 Activity History")

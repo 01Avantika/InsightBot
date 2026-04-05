@@ -11,6 +11,7 @@ load_dotenv()
 
 from db.database import save_message, get_user_chats, clear_chat
 from utils.llm import answer_data_question, pandas_query, answer_pdf_question, get_llm_provider, call_llm
+from utils.ui_components import render_sidebar
 import pandas as pd
 import numpy as np
 
@@ -27,59 +28,14 @@ df_summary  = st.session_state.get("current_df_summary", "")
 vectorstore = st.session_state.get("current_vectorstore")
 pdf_text    = st.session_state.get("current_pdf_text", "")
 
-st.markdown("""
-<style>
-    [data-testid="stSidebarNav"] { display: none; }
-    .context-badge {
-        background-color: var(--secondary-background-color);
-        border: 1px solid rgba(124,58,237,0.3);
-        border-radius: 8px; padding: 0.5rem 1rem;
-        margin-bottom: 1rem; font-size: 0.9rem;
-        color: var(--text-color);
-    }
-    div.stButton > button {
-        background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
-        color: white !important; border: none !important;
-        border-radius: 10px !important; font-weight: 600 !important;
-    }
-    .user-profile-footer {
-        display: flex; align-items: center; gap: 12px; padding: 12px;
-        border-radius: 12px; background-color: var(--secondary-background-color);
-        border: 1px solid rgba(124,58,237,0.2); margin-top: 10px;
-    }
-    .user-avatar {
-        width: 40px; height: 40px; background-color: #7c3aed; color: white !important;
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
-    }
-    .user-name  { font-weight: 600; font-size: 0.9rem; }
-    .user-email { font-size: 0.75rem; opacity: 0.6; }
-    /* anchor target for scroll */
-    #chat-bottom { height: 1px; }
-</style>
-""", unsafe_allow_html=True)
+render_sidebar(user)
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── Extra sidebar items (file context + clear chat) ──────────────────────────
 with st.sidebar:
-    st.markdown("""
-        <div style='margin-bottom:2rem;display:flex;align-items:center;gap:10px;'>
-            <div style='font-size:26px;'>🤖</div>
-            <div style='font-weight:700;font-size:20px;color:#7c3aed;'>InsightBot</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("### Navigation")
-    st.page_link("pages/dashboard.py", label="Dashboard")
-    st.page_link("pages/analyze.py",   label="Upload & Analyze")
-    st.page_link("pages/automl.py",    label="AutoML")
-    st.page_link("pages/chat.py",      label="Chat with Data")
-    st.page_link("pages/history.py",   label="History")
-
-    st.divider()
-
     if upload:
         ft = upload.get("file_type", "")
-        st.markdown(f"**📄 Active File:**\n`{upload.get('filename','')}`")
+        st.markdown("<hr style='border-color:var(--border); margin:.5rem .5rem'/>", unsafe_allow_html=True)
+        st.markdown(f"**📄 Active File:** `{upload.get('filename','')}`")
         if ft in ("csv","xlsx","xls") and df is not None:
             st.info(f"📊 {df.shape[0]:,} rows × {df.shape[1]} cols")
         elif ft == "pdf":
@@ -87,31 +43,14 @@ with st.sidebar:
             else:           st.warning("Text mode (no index)")
     else:
         st.info("No file loaded.\nGo to Upload & Analyze first.")
-
-    if st.button("Clear Chat", use_container_width=True):
+    if st.button("Clear Chat", use_container_width=True, key="clear_chat_btn"):
         uid = upload.get("id") if upload else None
         clear_chat(user["id"], uid)
         st.session_state["chat_history"] = []
         st.rerun()
 
-    st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
-    st.divider()
 
-    u_name    = user.get("username", "User")
-    u_email   = user.get("email", "")
-    u_initial = u_name[0].upper()
-    st.markdown(f"""
-        <div class="user-profile-footer">
-            <div class="user-avatar">{u_initial}</div>
-            <div>
-                <div class="user-name">{u_name}</div>
-                <div class="user-email">{u_email}</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    if st.button("Logout", use_container_width=True, key="logout_btn"):
-        st.session_state.clear()
-        st.switch_page("pages/login.py")
+
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 st.markdown("# 💬 Chat with Your Data")
