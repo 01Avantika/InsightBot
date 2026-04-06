@@ -225,6 +225,7 @@ def render_sidebar(user: dict) -> None:
         st.page_link("pages/automl.py",    label="⚙ AutoML")
         st.page_link("pages/chat.py",      label="🗨 Chat with Data")
         st.page_link("pages/history.py",   label="↺ History")
+        st.page_link("pages/Maker.py",            label="📊  Dashboard Creator")
 
         for _ in range(9):
             st.markdown("")
